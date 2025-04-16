@@ -1,0 +1,16 @@
+# Node dependencies
+node_modules/
+
+# Env vars and secrets
+.env
+
+# Slack bot state
+emoji_map.json
+
+# Logs and debug
+*.log
+npm-debug.log*
+
+# OS junk
+.DS_Store
+Thumbs.db
