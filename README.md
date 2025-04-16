@@ -1,43 +1,51 @@
 # Staging Butler
 
-Slack bot to manage integration server reservations from a shared channel using `/reserve` commands.
+Simple Slack bot that helps you and your team avoid stepping on each other when using shared integration servers.
+
+No dashboards. No spreadsheets. Just `/reserve int1` and it updates the topic in Slack.
 
 ---
 
-## Features
+## What It Does
 
-- Reserve or release integration servers (e.g. `int1`, `int2`) with custom emoji
-- View current status with `/reserve status`
-- Map emojis to Slack users (or yourself)
-- Clean and structured output
-- Fully managed via channel topic for visibility
+- Reserves or releases staging servers like `int1`, `int2`, etc.
+- Shows current state with `/reserve status`
+- Tracks who has what using emoji
+- Keeps everything visible by updating the channel topic
+- Anyone can use it. Anyone can change emoji mappings.
 
 ---
 
 ## Commands
 
-| Command                            | Description                                      |
-|------------------------------------|--------------------------------------------------|
-| `/reserve int1`                    | Reserves `int1` with your emoji                  |
-| `/reserve release int1`           | Releases `int1` back to `:free:`                 |
-| `/reserve status`                 | Shows structured status of all servers           |
-| `/reserve set-emoji :emoji:`      | Set your own emoji                               |
-| `/reserve set-emoji @user :emoji:`| Set emoji for someone else (optional fallback)   |
-| `/reserve list-emojis`           | Shows all emoji mappings                         |
+| Command                             | What it does                                  |
+|-------------------------------------|------------------------------------------------|
+| `/reserve int1`                     | Reserves `int1` with your emoji                |
+| `/reserve release int1`            | Marks `int1` as :free:                         |
+| `/reserve status`                  | Shows who's using what                         |
+| `/reserve set-emoji :emoji:`       | Sets your emoji (for tagging reservations)     |
+| `/reserve set-emoji @user :emoji:` | Sets someone else's emoji                      |
+| `/reserve list-emojis`            | Shows all emoji mappings                       |
 
 ---
 
-## Setup
+## Getting Started
 
-### 1. Clone and install
-```bash
-git clone git@github.com:youruser/staging-butler.git
+### 1. Clone it
+
+```sh
+git clone git@github.com:publitas/staging-butler.git
 cd staging-butler
+```
+
+### 2. Install deps
+
+```sh
 npm install
 ```
 
-### 2. Configure `.env`
-Create a `.env` file:
+### 3. Create a `.env` file
+
 ```env
 SLACK_BOT_TOKEN=your-xoxb-token
 SLACK_SIGNING_SECRET=your-signing-secret
@@ -45,32 +53,33 @@ STAGING_CHANNEL=C0123456789
 PORT=3000
 ```
 
-### 3. Run the bot
-```bash
-node slack_staging_reservation_bot.js
-```
-
 ---
 
-## Local Development (ngrok)
+## Running Locally (with ngrok)
 
-If running locally, expose the bot with [ngrok](https://ngrok.com):
+You’ll need a public URL for Slack to reach your bot. Use [ngrok](https://ngrok.com):
 
-```bash
+```sh
 ngrok http 3000
 ```
 
-Use the public HTTPS URL from ngrok as your Slack command Request URL, e.g.:
+Copy the HTTPS URL into your Slack app’s Slash Command config (as the request URL).
 
-```
-https://clever-tiger.ngrok-free.app/reserve
+---
+
+## Deploying on Fly.io
+
+```sh
+fly launch
+fly secrets set SLACK_BOT_TOKEN=... SLACK_SIGNING_SECRET=... STAGING_CHANNEL=...
+fly deploy
 ```
 
 ---
 
-## Slack Scopes Required
+## Slack Bot Scopes
 
-Your bot must have these **Bot Token Scopes**:
+You'll need these permissions:
 
 ```
 commands
@@ -82,30 +91,24 @@ groups:read
 groups:write
 ```
 
-Reinstall the app after updating scopes.
+Reinstall the bot after adding scopes.
 
 ---
 
-## Deployment on Fly.io (Optional)
+## File Structure
 
-If you want to deploy permanently:
-
-1. [Install Fly.io CLI](https://fly.io/docs/hands-on/install-flyctl/)
-2. Run:
-   ```bash
-   fly launch --no-deploy
-   ```
-3. Set your secrets:
-   ```bash
-   fly secrets set SLACK_BOT_TOKEN=... SLACK_SIGNING_SECRET=... STAGING_CHANNEL=...
-   ```
-4. Deploy it:
-   ```bash
-   fly deploy
-   ```
+```
+staging-butler/
+├── staging_butler_bot.js    # The actual bot
+├── emoji_map.json           # Who uses which emoji
+├── .env                     # Your local config
+├── .gitignore
+├── LICENSE
+└── README.md
+```
 
 ---
 
 ## License
 
-Staging Butler is released under the [MIT License](https://opensource.org/licenses/MIT), the same license used by Ruby on Rails.
+MIT – do what you want.
