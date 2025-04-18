@@ -1,4 +1,4 @@
-const { App } = require('@slack/bolt');
+const { App, ExpressReceiver } = require('@slack/bolt');
 const {
   SLACK_BOT_TOKEN,
   SLACK_SIGNING_SECRET,
@@ -23,10 +23,27 @@ if (!SLACK_SIGNING_SECRET) {
   process.exit(1);
 }
 
-// Initialize Slack app
+// Initialize custom receiver with health check endpoint
+const receiver = new ExpressReceiver({
+  signingSecret: SLACK_SIGNING_SECRET,
+  processBeforeResponse: true
+});
+
+// Add a health check endpoint
+receiver.router.get('/', (req, res) => {
+  logger.info('Health check request received');
+  res.json({
+    status: 'ok',
+    message: 'Staging Butler is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Initialize Slack app with custom receiver
 const app = new App({
   token: SLACK_BOT_TOKEN,
-  signingSecret: SLACK_SIGNING_SECRET
+  signingSecret: SLACK_SIGNING_SECRET,
+  receiver
 });
 
 // Handle errors in the Slack app
