@@ -63,6 +63,10 @@ app.command('/reserve', async ({ command, ack, respond, client }) => {
       await commandHandlers.help({ respond });
       break;
 
+    case 'firstline':
+      await commandHandlers.firstline({ args, command, respond, client });
+      break;
+
     default:
       // Default case: assume it's a reservation request
       await commandHandlers.reserve({

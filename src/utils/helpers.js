@@ -1,3 +1,23 @@
+const fs = require('fs');
+
+// Path to store the firstline person data
+const FIRSTLINE_PATH = './firstline.json';
+
+/**
+ * Load firstline data from file
+ * @returns {Object} Firstline data
+ */
+function loadFirstlineData() {
+  try {
+    if (!fs.existsSync(FIRSTLINE_PATH)) {
+      return { userId: null, timestamp: null };
+    }
+    return JSON.parse(fs.readFileSync(FIRSTLINE_PATH, 'utf8'));
+  } catch (error) {
+    return { userId: null, timestamp: null };
+  }
+}
+
 /**
  * Parse server status from channel topic
  * @param {string} topicText - The channel topic text
@@ -59,10 +79,17 @@ function formatServerStatus({ reserved, available }) {
     message += '🔐 *Reserved*: None';
   }
 
+  // Add firstline person if set
+  const firstlineData = loadFirstlineData();
+  if (firstlineData.userId) {
+    message += `  \n👤 *Firstline*: <@${firstlineData.userId}>`;
+  }
+
   return message;
 }
 
 module.exports = {
   parseServerStatus,
-  formatServerStatus
+  formatServerStatus,
+  loadFirstlineData
 };
