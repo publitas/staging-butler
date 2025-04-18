@@ -6,7 +6,6 @@ node_modules/
 
 # Slack bot state
 emoji_map.json
-firstline.json
 
 # Logs and debug
 *.log

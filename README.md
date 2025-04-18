@@ -12,8 +12,8 @@ No dashboards. No spreadsheets. Just a simple Slack bot that manages your stagin
 - Shows current state with `/reserve status`
 - Tracks who has what using emoji
 - Keeps everything visible by updating the channel topic
-- Designates a firstline person for staging server issues
-- Helps coordinate server releases with team members
+- Designates a firstline person
+- Helps coordinate servers with team members
 - Anyone can use it. Anyone can change emoji mappings.
 
 ---
