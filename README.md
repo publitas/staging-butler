@@ -151,6 +151,47 @@ Reinstall the bot after adding scopes.
 
 ---
 
+## Caching Strategy
+
+Staging Butler implements a caching system to reduce Slack API rate limiting issues. The caching system focuses on expensive API calls that are frequently made:
+
+### What's Cached
+
+1. **User List** - Cached for 1 hour
+   - Reduces calls to `users.list` API
+   - Used when looking up users by name
+
+2. **Channel Info** - Cached for 5 minutes
+   - Reduces calls to `conversations.info` API
+   - Used when reading the channel topic
+
+### Cache Invalidation
+
+- The cache automatically expires based on TTL (Time To Live)
+- Channel info cache is explicitly invalidated when the topic is updated
+- User list cache is refreshed when it expires
+
+### Debug Logging
+
+The app includes debug-level logging for cache operations:
+- Cache hits and misses
+- Cache refreshes
+- Cache invalidations
+
+To enable debug logging, set the `DEBUG` environment variable:
+
+```sh
+# Local development
+DEBUG=true npm start
+
+# On Fly.io
+fly secrets set DEBUG=true
+```
+
+This is particularly useful when troubleshooting rate limiting issues.
+
+---
+
 ## File Structure
 
 ```
@@ -171,7 +212,8 @@ staging-butler/
 │       ├── logger.js         # Logging utility
 │       ├── helpers.js        # Helper functions
 │       ├── validators.js     # Validation functions
-│       └── emojiStorage.js   # Emoji storage utility
+│       ├── emojiStorage.js   # Emoji storage utility
+│       └── cache.js          # Caching utility for API calls
 ├── emoji_map.json            # Who uses which emoji
 ├── .env                      # Your local config
 ├── .gitignore

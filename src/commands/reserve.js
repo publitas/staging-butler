@@ -1,6 +1,7 @@
 const { STAGING_CHANNEL, PATTERNS } = require('../config');
 const logger = require('../utils/logger');
 const emojiStorage = require('../utils/emojiStorage');
+const cache = require('../utils/cache');
 const { isValidServer, findUserId } = require('../utils/validators');
 
 /**
@@ -26,7 +27,8 @@ async function reserveCommand({ server, args, command, respond, client }) {
   }
 
   try {
-    const result = await client.conversations.info({ channel: STAGING_CHANNEL });
+    // Use cached channel info instead of making API call every time
+    const result = await cache.getChannelInfo(client, STAGING_CHANNEL);
     const originalText = result.channel.topic.value || '';
 
     // Check if server is mentioned in the topic
@@ -36,7 +38,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
     // Information mode - no arguments, just show who has the server
     if (args.length === 0) {
       if (!serverMatch) {
-        await respond(`Server ${server} is not found in the channel topic.`);
+        await respond(`⚠️ Server ${server} is not found in the channel topic.`);
         return;
       }
 
@@ -61,7 +63,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
     const targetUserId = await findUserId(userMention, client);
 
     if (!targetUserId) {
-      await respond('❌ Could not find user. Mention them properly or use their exact Slack @name.');
+      await respond('⚠️ Could not find user. Mention them properly or use their exact Slack @name.');
       logger.warn(`Reserve command failed - user not found: ${userMention}`);
       return;
     }
@@ -71,7 +73,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
     const emoji = emojiMap[targetUserId];
 
     if (!emoji) {
-      await respond(`User <@${targetUserId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\` or \`/reserve set-emoji @user :emoji:\``);
+      await respond(`⚠️ User <@${targetUserId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\` or \`/reserve set-emoji @user :emoji:\``);
       logger.warn(`Reserve command failed - no emoji set for user ${targetUserId}`);
       return;
     }
@@ -79,7 +81,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
     // Check if server is available
     const freeRegex = PATTERNS.FREE_SERVER(server);
     if (!freeRegex.test(originalText)) {
-      await respond(`Server ${server} is already reserved.`);
+      await respond(`⚠️ Server ${server} is already reserved.`);
       logger.info(`Reserve command - server ${server} already reserved`);
       return;
     }
@@ -92,6 +94,9 @@ async function reserveCommand({ server, args, command, respond, client }) {
       topic: updatedText
     });
 
+    // Invalidate the channel info cache since we updated the topic
+    cache.invalidateChannelInfo(STAGING_CHANNEL);
+
     await respond(`Server ${server} has been reserved for <@${targetUserId}> with ${emoji}`);
     logger.info(`Reserve command successful - reserved ${server} for user ${targetUserId} with ${emoji}`);
   } catch (error) {
@@ -103,7 +108,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `❌ *Error:* Could not process server ${server}. ${error.message || ''}`
+            text: `⚠️ *Error:* Could not process server ${server}. ${error.message || ''}`
           }
         }
       ]

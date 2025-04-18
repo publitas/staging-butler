@@ -1,5 +1,6 @@
 const { STAGING_CHANNEL, PATTERNS } = require('../config');
 const logger = require('../utils/logger');
+const cache = require('../utils/cache');
 const { isValidServer } = require('../utils/validators');
 
 /**
@@ -44,10 +45,10 @@ async function releaseCommand({ args, command, respond, client }) {
       // Handle missing permissions gracefully
       if (error.code === 'slack_webapi_platform_error' && 
           error.data && error.data.error === 'missing_scope') {
-        await respond("I'd like to ask the team about releasing a server, but I need the `chat:write` permission. For now, you can post the message yourself or specify which server to release.");
+        await respond("⚠️ I'd like to ask the team about releasing a server, but I need the `chat:write` permission. For now, you can post the message yourself or specify which server to release.");
         logger.warn('Could not post release question to channel - missing chat:write permission.');
       } else {
-        await respond("I couldn't post a message to the channel. You can post the message yourself or specify which server to release.");
+        await respond("⚠️ I couldn't post a message to the channel. You can post the message yourself or specify which server to release.");
         logger.error('Failed to post release question to channel', error);
       }
     }
@@ -63,18 +64,19 @@ async function releaseCommand({ args, command, respond, client }) {
   }
 
   if (!isValidServer(server)) {
-    await respond(`❌ Invalid server name: ${server}. Server names should be in the format 'int1', 'int2', etc.`);
+    await respond(`⚠️ Invalid server name: ${server}. Server names should be in the format 'int1', 'int2', etc.`);
     logger.warn(`Release command failed - invalid server name: ${server}`);
     return;
   }
 
   try {
-    const result = await client.conversations.info({ channel: STAGING_CHANNEL });
+    // Use cached channel info instead of making API call every time
+    const result = await cache.getChannelInfo(client, STAGING_CHANNEL);
     const originalText = result.channel.topic.value || '';
     const regex = PATTERNS.SERVER_IN_TOPIC(server);
 
     if (!regex.test(originalText)) {
-      await respond(`No reservation found for ${server}.`);
+      await respond(`⚠️ No reservation found for ${server}.`);
       logger.info(`Release command - no reservation found for ${server}`);
       return;
     }
@@ -87,6 +89,9 @@ async function releaseCommand({ args, command, respond, client }) {
       topic: updatedText
     });
 
+    // Invalidate the channel info cache since we updated the topic
+    cache.invalidateChannelInfo(STAGING_CHANNEL);
+
     await respond(`Server ${server} has been released and marked as :free:`);
     logger.info(`Release command successful - released ${server}`);
   } catch (error) {
@@ -98,7 +103,7 @@ async function releaseCommand({ args, command, respond, client }) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `❌ *Error:* Could not release server ${server}. ${error.message || ''}`
+            text: `⚠️ *Error:* Could not release server ${server}. ${error.message || ''}`
           }
         }
       ]

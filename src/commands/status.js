@@ -1,5 +1,6 @@
 const { STAGING_CHANNEL } = require('../config');
 const logger = require('../utils/logger');
+const cache = require('../utils/cache');
 const { parseServerStatus, formatServerStatus } = require('../utils/helpers');
 
 /**
@@ -10,7 +11,8 @@ const { parseServerStatus, formatServerStatus } = require('../utils/helpers');
  */
 async function statusCommand({ respond, client }) {
   try {
-    const result = await client.conversations.info({ channel: STAGING_CHANNEL });
+    // Use cached channel info instead of making API call every time
+    const result = await cache.getChannelInfo(client, STAGING_CHANNEL);
     const currentText = result.channel.topic.value || '';
     const status = parseServerStatus(currentText);
 
@@ -25,7 +27,7 @@ async function statusCommand({ respond, client }) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: '❌ *Error:* Could not retrieve the server status.'
+            text: '⚠️ *Error:* Could not retrieve the server status.'
           }
         }
       ]

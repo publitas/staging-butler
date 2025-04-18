@@ -1,5 +1,6 @@
 const { PATTERNS } = require('../config');
 const logger = require('./logger');
+const cache = require('./cache');
 
 /**
  * Validate if a string is a valid server name
@@ -37,7 +38,8 @@ async function findUserId(userMention, client) {
   }
 
   try {
-    const usersList = await client.users.list();
+    // Use cached user list instead of making API call every time
+    const usersList = await cache.getUsersList(client);
     const plainTextUsername = userMention.replace(/^@/, '').toLowerCase();
 
     const user = usersList.members.find((u) => {

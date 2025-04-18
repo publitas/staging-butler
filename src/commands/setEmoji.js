@@ -24,7 +24,7 @@ async function setEmojiCommand({ args, command, respond, client }) {
     userId = await findUserId(userMention, client);
 
     if (!userId) {
-      await respond('❌ Could not find user. Mention them properly or use their exact Slack @name.');
+      await respond('⚠️ Could not find user. Mention them properly or use their exact Slack @name.');
       logger.warn(`Set-emoji failed - user not found: ${userMention}`);
       return;
     }
@@ -35,7 +35,7 @@ async function setEmojiCommand({ args, command, respond, client }) {
   }
 
   if (!isValidEmoji(emoji)) {
-    await respond('❌ Invalid emoji format. Please use a valid Slack emoji like `:smile:`.');
+    await respond('⚠️ Invalid emoji format. Please use a valid Slack emoji like `:smile:`.');
     logger.warn(`Set-emoji failed - invalid emoji format: ${emoji}`);
     return;
   }
@@ -47,7 +47,7 @@ async function setEmojiCommand({ args, command, respond, client }) {
     await respond(`Mapped <@${userId}> to ${emoji}`);
     logger.info(`Set-emoji successful - mapped user ${userId} to ${emoji}`);
   } else {
-    await respond('❌ Failed to save emoji mapping. Please try again later.');
+    await respond('⚠️ Failed to save emoji mapping. Please try again later.');
     logger.error('Set-emoji failed - could not save emoji map');
   }
 }
