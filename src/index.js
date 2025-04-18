@@ -56,7 +56,7 @@ app.command('/reserve', async ({ command, ack, respond, client }) => {
       break;
 
     case 'release':
-      await commandHandlers.release({ args, respond, client });
+      await commandHandlers.release({ command, args, respond, client });
       break;
 
     case 'help':

@@ -10,6 +10,7 @@ async function helpCommand({ respond }) {
     '*Available Commands:*\n' +
     '• `/reserve int1` - Check server status\n' +
     '• `/reserve int1 @user` - Reserve server for a user\n' +
+    '• `/reserve release` - Ask team if there\'s a server to release\n' +
     '• `/reserve release int1` - Release a server\n' +
     '• `/reserve status` - Show current reservations\n' +
     '• `/reserve set-emoji :emoji:` - Set your emoji\n' +
