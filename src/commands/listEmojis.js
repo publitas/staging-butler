@@ -16,7 +16,7 @@ async function listEmojisCommand({ respond }) {
   }
 
   const formatted = Object.entries(emojiMap)
-    .map(([userId, emoji]) => `• <@${userId}> → ${emoji}`)
+    .map(([userId, emoji]) => `• ${emoji} → <@${userId}>`)
     .join('\n');
 
   await respond(`🗂️ *Emoji Mappings:*\n${formatted}`);
