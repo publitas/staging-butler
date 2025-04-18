@@ -19,11 +19,12 @@ function parseServerStatus(topicText) {
     if (serverMatch && emojiMatch) {
       const server = serverMatch[1];
       const emoji = tokens[i + 1];
+      const emojiName = emoji.replace(/^:([^:]+):$/, '$1');
 
       if (emoji === ':free:') {
-        available.push(`• ${server}`);
+        available.push(server);
       } else {
-        reserved.push(`• ${server}${emoji ? ` → ${emoji}` : ''}`);
+        reserved.push({ server, emoji, emojiName });
       }
     }
   }
@@ -37,16 +38,28 @@ function parseServerStatus(topicText) {
  * @returns {string} Formatted message for Slack
  */
 function formatServerStatus({ reserved, available }) {
-  const responseLines = ['*🖥️ Server Reservations*', ''];
+  // Create the status display with the suggested emojis
+  let message = ''; // '📋 *Server Reservation Status*\n\n';
 
-  responseLines.push('*Reserved:*');
-  responseLines.push(reserved.length ? reserved.join('\n') : 'None');
-  responseLines.push('');
+  // Available servers with unlock emoji
+  if (available.length > 0) {
+    message += `🔏 *Available*: ${available.join(', ')}`;
+  } else {
+    message += '🔏 *Available*: None';
+  }
 
-  responseLines.push('*Available:*');
-  responseLines.push(available.length ? available.join('\n') : 'None');
+  message += '  \n';
 
-  return responseLines.join('\n');
+  // Reserved servers with locked with key emoji
+  if (reserved.length > 0) {
+    message += `🔐 *Reserved*: ${reserved.map(({ server, emojiName }) =>
+      `${server} (@${emojiName})`
+    ).join(', ')}`;
+  } else {
+    message += '🔐 *Reserved*: None';
+  }
+
+  return message;
 }
 
 module.exports = {
