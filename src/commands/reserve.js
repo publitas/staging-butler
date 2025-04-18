@@ -20,7 +20,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
   }
 
   if (!isValidServer(server)) {
-    await respond(`❌ Invalid server name: ${server}. Server names should be in the format 'int1', 'int2', etc.`);
+    await respond(`⚠️ Invalid server name: ${server}. Server names should be in the format 'int1', 'int2', etc.`);
     logger.warn(`Reserve command failed - invalid server name: ${server}`);
     return;
   }
@@ -71,7 +71,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
     const emoji = emojiMap[targetUserId];
 
     if (!emoji) {
-      await respond(`User <@${targetUserId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\``);
+      await respond(`User <@${targetUserId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\` or \`/reserve set-emoji @user :emoji:\``);
       logger.warn(`Reserve command failed - no emoji set for user ${targetUserId}`);
       return;
     }

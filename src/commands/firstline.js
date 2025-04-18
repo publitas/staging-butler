@@ -26,7 +26,7 @@ async function firstlineCommand({ args, command, respond, client }) {
         return;
       }
       
-      await respond(`Current firstline person: @${status.firstline}`);
+      await respond(`Current firstline person: :${status.firstline}:`);
       return;
     }
     
@@ -45,7 +45,7 @@ async function firstlineCommand({ args, command, respond, client }) {
     const userEmoji = emojiMap[userId];
     
     if (!userEmoji) {
-      await respond(`User <@${userId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\``);
+      await respond(`User <@${userId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\` or \`/reserve set-emoji @user :emoji:\``);
       logger.warn(`Firstline command failed - no emoji set for user ${userId}`);
       return;
     }
@@ -67,7 +67,7 @@ async function firstlineCommand({ args, command, respond, client }) {
       topic: updatedTopic
     });
     
-    await respond(`✅ @${username} is now set as the firstline person.`);
+    await respond(`${userEmoji} is now set as the firstline person.`);
     logger.info(`Firstline command successful - set user ${username} as firstline`);
   } catch (error) {
     logger.error('Failed to execute firstline command', error);

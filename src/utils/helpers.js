@@ -81,7 +81,7 @@ function formatServerStatus({ reserved, available, firstline }) {
   // Reserved servers with locked with key emoji
   if (reserved.length > 0) {
     message += `:closed_lock_with_key: *Reserved*: ${reserved.map(({ server, emojiName }) =>
-      `${server} (@${emojiName})`
+      `${server} (:${emojiName}:)`
     ).join(', ')}`;
   } else {
     message += ':closed_lock_with_key: *Reserved*: None';
@@ -89,7 +89,7 @@ function formatServerStatus({ reserved, available, firstline }) {
 
   // Add firstline person if set
   if (firstline) {
-    message += `  \n:bust_in_silhouette: *Firstline*: @${firstline}`;
+    message += `  \n:bust_in_silhouette: *Firstline*: :${firstline}:`;
   }
 
   return message;
