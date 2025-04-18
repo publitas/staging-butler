@@ -13,6 +13,7 @@ No dashboards. No spreadsheets. Just a simple Slack bot that manages your stagin
 - Tracks who has what using emoji
 - Keeps everything visible by updating the channel topic
 - Designates a firstline person for staging server issues
+- Helps coordinate server releases with team members
 - Anyone can use it. Anyone can change emoji mappings.
 
 ---
@@ -23,6 +24,7 @@ No dashboards. No spreadsheets. Just a simple Slack bot that manages your stagin
 |-------------------------------------|------------------------------------------------|
 | `/reserve int1`                     | Shows who has reserved `int1`                  |
 | `/reserve int1 @user`               | Reserves `int1` for the specified user         |
+| `/reserve release`                  | Ask team if there's a server to release        |
 | `/reserve release int1`             | Marks `int1` as :free:                         |
 | `/reserve status`                   | Shows who's using what                         |
 | `/reserve set-emoji :emoji:`        | Sets your emoji (for tagging reservations)     |
@@ -94,8 +96,13 @@ channels:manage
 channels:join
 groups:read
 groups:write
-chat:write (optional - for channel notifications)
+chat:write
 ```
+
+The `chat:write` permission is required for features like:
+- Posting firstline updates to the channel
+- Asking the team about server releases
+- Other interactive messages
 
 Reinstall the bot after adding scopes.
 
