@@ -49,45 +49,52 @@ async function firstlineCommand({ args, command, respond, client }) {
   // If no arguments, show current firstline person
   if (args.length === 0) {
     const firstlineData = loadFirstlineData();
-    
+
     if (!firstlineData.userId) {
       await respond('No firstline person is currently set. Use `/reserve firstline @username` to set one.');
       return;
     }
-    
+
     const timestamp = new Date(firstlineData.timestamp).toLocaleString();
     await respond(`Current firstline person: <@${firstlineData.userId}> (set on ${timestamp})`);
     return;
   }
-  
+
   // Set new firstline person
   const userMention = args[0];
   const userId = await findUserId(userMention, client);
-  
+
   if (!userId) {
     await respond('❌ Could not find user. Mention them properly or use their exact Slack @name.');
     logger.warn(`Firstline command failed - user not found: ${userMention}`);
     return;
   }
-  
+
   // Save the new firstline person
   const firstlineData = {
     userId,
     timestamp: new Date().toISOString()
   };
-  
+
   if (saveFirstlineData(firstlineData)) {
     await respond(`✅ <@${userId}> is now set as the firstline person.`);
     logger.info(`Firstline command successful - set user ${userId} as firstline`);
-    
-    // Also post a message to the staging channel
+
+    // Try to post a message to the channel, but handle missing permissions gracefully
     try {
       await client.chat.postMessage({
         channel: STAGING_CHANNEL,
         text: `🔔 <@${userId}> is now the firstline person for staging server issues.`
       });
     } catch (error) {
-      logger.error('Failed to post firstline update to channel', error);
+      // If it's a missing_scope error, just log it but don't treat it as a failure
+      if (error.code === 'slack_webapi_platform_error' &&
+          error.data && error.data.error === 'missing_scope') {
+        logger.warn('Could not post firstline update to channel - missing chat:write permission. ' +
+                   'Add the chat:write scope to your bot to enable this feature.');
+      } else {
+        logger.error('Failed to post firstline update to channel', error);
+      }
     }
   } else {
     await respond('❌ Failed to save firstline data. Please try again later.');
