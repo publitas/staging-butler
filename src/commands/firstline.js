@@ -1,41 +1,8 @@
 const { STAGING_CHANNEL } = require('../config');
 const logger = require('../utils/logger');
 const { findUserId } = require('../utils/validators');
-const fs = require('fs');
-
-// Path to store the firstline person data
-const FIRSTLINE_PATH = './firstline.json';
-
-/**
- * Load firstline data from file
- * @returns {Object} Firstline data
- */
-function loadFirstlineData() {
-  try {
-    if (!fs.existsSync(FIRSTLINE_PATH)) {
-      return { userId: null, timestamp: null };
-    }
-    return JSON.parse(fs.readFileSync(FIRSTLINE_PATH, 'utf8'));
-  } catch (error) {
-    logger.error(`Failed to load firstline data from ${FIRSTLINE_PATH}`, error);
-    return { userId: null, timestamp: null };
-  }
-}
-
-/**
- * Save firstline data to file
- * @param {Object} data - Firstline data to save
- * @returns {boolean} Success or failure
- */
-function saveFirstlineData(data) {
-  try {
-    fs.writeFileSync(FIRSTLINE_PATH, JSON.stringify(data, null, 2));
-    return true;
-  } catch (error) {
-    logger.error(`Failed to save firstline data to ${FIRSTLINE_PATH}`, error);
-    return false;
-  }
-}
+const { parseServerStatus, updateFirstlineInTopic } = require('../utils/helpers');
+const emojiStorage = require('../utils/emojiStorage');
 
 /**
  * Handle the firstline command
@@ -46,59 +13,65 @@ function saveFirstlineData(data) {
  * @param {Object} params.client - Slack client
  */
 async function firstlineCommand({ args, command, respond, client }) {
-  // If no arguments, show current firstline person
-  if (args.length === 0) {
-    const firstlineData = loadFirstlineData();
-
-    if (!firstlineData.userId) {
-      await respond('No firstline person is currently set. Use `/reserve firstline @username` to set one.');
+  try {
+    // Get current channel topic
+    const result = await client.conversations.info({ channel: STAGING_CHANNEL });
+    const currentTopic = result.channel.topic.value || '';
+    const status = parseServerStatus(currentTopic);
+    
+    // If no arguments, show current firstline person
+    if (args.length === 0) {
+      if (!status.firstline) {
+        await respond('No firstline person is currently set. Use `/reserve firstline @username` to set one.');
+        return;
+      }
+      
+      await respond(`Current firstline person: @${status.firstline}`);
       return;
     }
-
-    const timestamp = new Date(firstlineData.timestamp).toLocaleString();
-    await respond(`Current firstline person: <@${firstlineData.userId}> (set on ${timestamp})`);
-    return;
-  }
-
-  // Set new firstline person
-  const userMention = args[0];
-  const userId = await findUserId(userMention, client);
-
-  if (!userId) {
-    await respond('❌ Could not find user. Mention them properly or use their exact Slack @name.');
-    logger.warn(`Firstline command failed - user not found: ${userMention}`);
-    return;
-  }
-
-  // Save the new firstline person
-  const firstlineData = {
-    userId,
-    timestamp: new Date().toISOString()
-  };
-
-  if (saveFirstlineData(firstlineData)) {
-    await respond(`✅ <@${userId}> is now set as the firstline person.`);
-    logger.info(`Firstline command successful - set user ${userId} as firstline`);
-
-    // Try to post a message to the channel, but handle missing permissions gracefully
-    try {
-      await client.chat.postMessage({
-        channel: STAGING_CHANNEL,
-        text: `🔔 <@${userId}> is now the firstline person for staging server issues.`
-      });
-    } catch (error) {
-      // If it's a missing_scope error, just log it but don't treat it as a failure
-      if (error.code === 'slack_webapi_platform_error' &&
-          error.data && error.data.error === 'missing_scope') {
-        logger.warn('Could not post firstline update to channel - missing chat:write permission. ' +
-                   'Add the chat:write scope to your bot to enable this feature.');
-      } else {
-        logger.error('Failed to post firstline update to channel', error);
-      }
+    
+    // Set new firstline person
+    const userMention = args[0];
+    const userId = await findUserId(userMention, client);
+    
+    if (!userId) {
+      await respond('❌ Could not find user. Mention them properly or use their exact Slack @name.');
+      logger.warn(`Firstline command failed - user not found: ${userMention}`);
+      return;
     }
-  } else {
-    await respond('❌ Failed to save firstline data. Please try again later.');
-    logger.error('Firstline command failed - could not save data');
+    
+    // Get the user's emoji from the emoji map
+    const emojiMap = emojiStorage.load();
+    const userEmoji = emojiMap[userId];
+    
+    if (!userEmoji) {
+      await respond(`User <@${userId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\``);
+      logger.warn(`Firstline command failed - no emoji set for user ${userId}`);
+      return;
+    }
+    
+    // Get the user info to get their username
+    const userInfo = await client.users.info({ user: userId });
+    const username = userInfo.user.name;
+    
+    logger.info(`Setting firstline - User ID: ${userId}, Username: ${username}, Emoji: ${userEmoji}`);
+    
+    // Update the topic with the new firstline person
+    const updatedTopic = updateFirstlineInTopic(currentTopic, username, userEmoji);
+    
+    logger.info(`Current topic: "${currentTopic}"`);
+    logger.info(`Updated topic: "${updatedTopic}"`);
+    
+    await client.conversations.setTopic({
+      channel: STAGING_CHANNEL,
+      topic: updatedTopic
+    });
+    
+    await respond(`✅ @${username} is now set as the firstline person.`);
+    logger.info(`Firstline command successful - set user ${username} as firstline`);
+  } catch (error) {
+    logger.error('Failed to execute firstline command', error);
+    await respond('❌ Failed to update the firstline person. Please try again later.');
   }
 }
 

@@ -79,6 +79,7 @@ async function releaseCommand({ args, command, respond, client }) {
       return;
     }
 
+    // Make sure we preserve the firstline information when updating the topic
     const updatedText = originalText.replace(regex, `${server}: :free:`);
 
     await client.conversations.setTopic({

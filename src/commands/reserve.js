@@ -84,7 +84,7 @@ async function reserveCommand({ server, args, command, respond, client }) {
       return;
     }
 
-    // Reserve the server
+    // Reserve the server (preserves firstline and other entries in the topic)
     const updatedText = originalText.replace(freeRegex, `${server}: ${emoji}`);
 
     await client.conversations.setTopic({
