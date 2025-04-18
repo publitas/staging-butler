@@ -59,30 +59,30 @@ function parseServerStatus(topicText) {
  */
 function formatServerStatus({ reserved, available }) {
   // Create the status display with the suggested emojis
-  let message = ''; // '📋 *Server Reservation Status*\n\n';
+  let message = '';
 
   // Available servers with unlock emoji
   if (available.length > 0) {
-    message += `🔏 *Available*: ${available.join(', ')}`;
+    message += `:lock_with_ink_pen: *Available*: ${available.join(', ')}`;
   } else {
-    message += '🔏 *Available*: None';
+    message += ':lock_with_ink_pen: *Available*: None';
   }
 
   message += '  \n';
 
   // Reserved servers with locked with key emoji
   if (reserved.length > 0) {
-    message += `🔐 *Reserved*: ${reserved.map(({ server, emojiName }) =>
+    message += `:closed_lock_with_key: *Reserved*: ${reserved.map(({ server, emojiName }) =>
       `${server} (@${emojiName})`
     ).join(', ')}`;
   } else {
-    message += '🔐 *Reserved*: None';
+    message += ':closed_lock_with_key: *Reserved*: None';
   }
 
   // Add firstline person if set
   const firstlineData = loadFirstlineData();
   if (firstlineData.userId) {
-    message += `  \n👤 *Firstline*: <@${firstlineData.userId}>`;
+    message += `  \n:bust_in_silhouette: *Firstline*: <@${firstlineData.userId}>`;
   }
 
   return message;
