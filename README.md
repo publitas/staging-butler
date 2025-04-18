@@ -76,7 +76,7 @@ Copy the HTTPS URL into your Slack app's Slash Command config (as the request UR
 
 ## Deploying on Fly.io
 
-The app requires persistent storage for the emoji mappings. Follow these steps to deploy:
+The app requires persistent storage for the emoji mappings. Follow these simple steps to deploy:
 
 ```sh
 # 1. Create a volume for persistent storage
@@ -88,11 +88,42 @@ fly secrets set SLACK_BOT_TOKEN=... SLACK_SIGNING_SECRET=... STAGING_CHANNEL=...
 # 3. Set the path to the emoji map file on the volume
 fly secrets set EMOJI_MAP_PATH=/app/data/emoji_map.json
 
-# 4. Deploy the app
-fly deploy
+# 4. Deploy the app with a single machine (recommended for this simple bot)
+fly deploy --ha=false
 ```
 
-Note: If you encounter an error about missing volumes, make sure the volume is created in the same region as your app.
+> **Important:** Use the `--ha=false` flag to deploy with just one machine. This is all you need for a simple Slack bot, and it avoids unnecessary complexity.
+
+### Fly.toml Configuration
+
+Your `fly.toml` file should have these settings to prevent the app from stopping automatically:
+
+```toml
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = false
+  min_machines_running = 1
+  processes = ['app']
+
+[mounts]
+  source = "data"
+  destination = "/app/data"
+  processes = ["app"]
+```
+
+> **Note:** Use single brackets `[mounts]` not double brackets `[[mounts]]` for the mounts section.
+
+### Starting Your App
+
+If your app does stop for any reason, you can restart it with:
+
+```sh
+fly apps restart staging-butler
+```
+
+This is much easier than having to use machine IDs.
 
 ---
 
