@@ -8,7 +8,8 @@ const logger = require('../utils/logger');
 async function helpCommand({ respond }) {
   await respond(
     '*Available Commands:*\n' +
-    '• `/reserve int1` - Reserve a server\n' +
+    '• `/reserve int1` - Check server status\n' +
+    '• `/reserve int1 @user` - Reserve server for a user\n' +
     '• `/reserve release int1` - Release a server\n' +
     '• `/reserve status` - Show current reservations\n' +
     '• `/reserve set-emoji :emoji:` - Set your emoji\n' +

@@ -73,7 +73,8 @@ app.command('/reserve', async ({ command, ack, respond, client }) => {
         server: subcommand?.toLowerCase(),
         command,
         respond,
-        client
+        client,
+        args
       });
   }
 });
