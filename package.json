@@ -2,9 +2,9 @@
   "name": "staging-butler",
   "version": "0.1.0",
   "description": "A Slack bot that manages internal environment reservations using slash commands and channel topics.",
-  "main": "staging-butler.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node staging-butler.js"
+    "start": "node src/index.js"
   },
   "keywords": [
     "slack",
