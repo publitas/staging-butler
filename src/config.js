@@ -2,7 +2,7 @@
  * Configuration settings for the Staging Butler app
  */
 
-const EMOJI_MAP_PATH = './emoji_map.json';
+const EMOJI_MAP_PATH = process.env.EMOJI_MAP_PATH || './emoji_map.json';
 
 const STAGING_CHANNEL = process.env.STAGING_CHANNEL;
 const PORT = process.env.PORT || 3000;

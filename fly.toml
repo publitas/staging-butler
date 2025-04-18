@@ -20,3 +20,7 @@ primary_region = 'mad'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+
+[[mounts]]
+  source = "data"
+  destination = "/app/data"
