@@ -76,11 +76,23 @@ Copy the HTTPS URL into your Slack app's Slash Command config (as the request UR
 
 ## Deploying on Fly.io
 
+The app requires persistent storage for the emoji mappings. Follow these steps to deploy:
+
 ```sh
-fly launch
+# 1. Create a volume for persistent storage
+fly volumes create data --region mad --size 1
+
+# 2. Set required secrets
 fly secrets set SLACK_BOT_TOKEN=... SLACK_SIGNING_SECRET=... STAGING_CHANNEL=...
+
+# 3. Set the path to the emoji map file on the volume
+fly secrets set EMOJI_MAP_PATH=/app/data/emoji_map.json
+
+# 4. Deploy the app
 fly deploy
 ```
+
+Note: If you encounter an error about missing volumes, make sure the volume is created in the same region as your app.
 
 ---
 
