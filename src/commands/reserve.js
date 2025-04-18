@@ -28,18 +28,18 @@ async function reserveCommand({ server, args, command, respond, client }) {
   try {
     const result = await client.conversations.info({ channel: STAGING_CHANNEL });
     const originalText = result.channel.topic.value || '';
-    
+
     // Check if server is mentioned in the topic
     const serverRegex = PATTERNS.SERVER_IN_TOPIC(server);
     const serverMatch = originalText.match(serverRegex);
-    
+
     // Information mode - no arguments, just show who has the server
     if (args.length === 0) {
       if (!serverMatch) {
         await respond(`Server ${server} is not found in the channel topic.`);
         return;
       }
-      
+
       const freeRegex = PATTERNS.FREE_SERVER(server);
       if (freeRegex.test(originalText)) {
         await respond(`Server ${server} is currently available.`);
@@ -55,27 +55,27 @@ async function reserveCommand({ server, args, command, respond, client }) {
       }
       return;
     }
-    
+
     // Action mode - with user argument, reserve the server for that user
     const userMention = args[0];
     const targetUserId = await findUserId(userMention, client);
-    
+
     if (!targetUserId) {
       await respond('❌ Could not find user. Mention them properly or use their exact Slack @name.');
       logger.warn(`Reserve command failed - user not found: ${userMention}`);
       return;
     }
-    
+
     // Get the emoji for the target user
     const emojiMap = emojiStorage.load();
     const emoji = emojiMap[targetUserId];
-    
+
     if (!emoji) {
       await respond(`User <@${targetUserId}> doesn't have an emoji set. They need to set one using \`/reserve set-emoji :emoji:\``);
       logger.warn(`Reserve command failed - no emoji set for user ${targetUserId}`);
       return;
     }
-    
+
     // Check if server is available
     const freeRegex = PATTERNS.FREE_SERVER(server);
     if (!freeRegex.test(originalText)) {
@@ -83,15 +83,15 @@ async function reserveCommand({ server, args, command, respond, client }) {
       logger.info(`Reserve command - server ${server} already reserved`);
       return;
     }
-    
+
     // Reserve the server
     const updatedText = originalText.replace(freeRegex, `${server}: ${emoji}`);
-    
+
     await client.conversations.setTopic({
       channel: STAGING_CHANNEL,
       topic: updatedText
     });
-    
+
     await respond(`Server ${server} has been reserved for <@${targetUserId}> with ${emoji}`);
     logger.info(`Reserve command successful - reserved ${server} for user ${targetUserId} with ${emoji}`);
   } catch (error) {

@@ -8,17 +8,17 @@ const logger = require('../utils/logger');
  */
 async function listEmojisCommand({ respond }) {
   const emojiMap = emojiStorage.load();
-  
+
   if (Object.keys(emojiMap).length === 0) {
     await respond('🙈 No emoji mappings are currently set.');
     logger.info('List-emojis command executed - no mappings found');
     return;
   }
-  
+
   const formatted = Object.entries(emojiMap)
     .map(([userId, emoji]) => `• <@${userId}> → ${emoji}`)
     .join('\n');
-    
+
   await respond(`🗂️ *Emoji Mappings:*\n${formatted}`);
   logger.info(`List-emojis command executed - found ${Object.keys(emojiMap).length} mappings`);
 }

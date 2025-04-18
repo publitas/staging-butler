@@ -22,7 +22,7 @@ async function setEmojiCommand({ args, command, respond, client }) {
     emoji = args[1];
 
     userId = await findUserId(userMention, client);
-    
+
     if (!userId) {
       await respond('❌ Could not find user. Mention them properly or use their exact Slack @name.');
       logger.warn(`Set-emoji failed - user not found: ${userMention}`);
@@ -42,7 +42,7 @@ async function setEmojiCommand({ args, command, respond, client }) {
 
   const emojiMap = emojiStorage.load();
   emojiMap[userId] = emoji;
-  
+
   if (emojiStorage.save(emojiMap)) {
     await respond(`Mapped <@${userId}> to ${emoji}`);
     logger.info(`Set-emoji successful - mapped user ${userId} to ${emoji}`);
