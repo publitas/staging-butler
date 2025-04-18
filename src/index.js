@@ -105,9 +105,9 @@ app.command('/reserve', async ({ command, ack, respond, client }) => {
     const join = await app.client.conversations.join({ channel: STAGING_CHANNEL });
 
     if (join.already_in_channel) {
-      logger.info('Bot is already in the staging channel.');
+      logger.info('Bot is already in the configured channel.');
     } else {
-      logger.info('Bot joined the staging channel.');
+      logger.info('Bot joined the configured channel.');
     }
   } catch (error) {
     logger.error('Startup failure', error);
