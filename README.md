@@ -130,7 +130,6 @@ staging-butler/
 │       ├── validators.js     # Validation functions
 │       └── emojiStorage.js   # Emoji storage utility
 ├── emoji_map.json            # Who uses which emoji
-├── firstline.json            # Current firstline person
 ├── .env                      # Your local config
 ├── .gitignore
 ├── package.json
