@@ -2,7 +2,7 @@
 
 Simple Slack bot that helps you and your team avoid stepping on each other when using shared integration servers.
 
-No dashboards. No spreadsheets. Just `/reserve int1` and it updates the topic in Slack.
+No dashboards. No spreadsheets. Just a simple Slack bot that manages your staging environment.
 
 ---
 
@@ -12,6 +12,7 @@ No dashboards. No spreadsheets. Just `/reserve int1` and it updates the topic in
 - Shows current state with `/reserve status`
 - Tracks who has what using emoji
 - Keeps everything visible by updating the channel topic
+- Designates a firstline person for staging server issues
 - Anyone can use it. Anyone can change emoji mappings.
 
 ---
@@ -20,12 +21,16 @@ No dashboards. No spreadsheets. Just `/reserve int1` and it updates the topic in
 
 | Command                             | What it does                                  |
 |-------------------------------------|------------------------------------------------|
-| `/reserve int1`                     | Reserves `int1` with your emoji                |
-| `/reserve release int1`            | Marks `int1` as :free:                         |
-| `/reserve status`                  | Shows who's using what                         |
-| `/reserve set-emoji :emoji:`       | Sets your emoji (for tagging reservations)     |
-| `/reserve set-emoji @user :emoji:` | Sets someone else's emoji                      |
-| `/reserve list-emojis`            | Shows all emoji mappings                       |
+| `/reserve int1`                     | Shows who has reserved `int1`                  |
+| `/reserve int1 @user`               | Reserves `int1` for the specified user         |
+| `/reserve release int1`             | Marks `int1` as :free:                         |
+| `/reserve status`                   | Shows who's using what                         |
+| `/reserve set-emoji :emoji:`        | Sets your emoji (for tagging reservations)     |
+| `/reserve set-emoji @user :emoji:`  | Sets someone else's emoji                      |
+| `/reserve list-emojis`              | Shows all emoji mappings                       |
+| `/reserve firstline`                | Shows current firstline person                 |
+| `/reserve firstline @user`          | Sets firstline person for staging issues       |
+| `/reserve help`                     | Shows all available commands                   |
 
 ---
 
@@ -57,13 +62,13 @@ PORT=3000
 
 ## Running Locally (with ngrok)
 
-You’ll need a public URL for Slack to reach your bot. Use [ngrok](https://ngrok.com):
+You'll need a public URL for Slack to reach your bot. Use [ngrok](https://ngrok.com):
 
 ```sh
 ngrok http 3000
 ```
 
-Copy the HTTPS URL into your Slack app’s Slash Command config (as the request URL).
+Copy the HTTPS URL into your Slack app's Slash Command config (as the request URL).
 
 ---
 
@@ -89,6 +94,7 @@ channels:manage
 channels:join
 groups:read
 groups:write
+chat:write (optional - for channel notifications)
 ```
 
 Reinstall the bot after adding scopes.
@@ -99,10 +105,28 @@ Reinstall the bot after adding scopes.
 
 ```
 staging-butler/
-├── staging_butler_bot.js    # The actual bot
-├── emoji_map.json           # Who uses which emoji
-├── .env                     # Your local config
+├── src/                      # Source code directory
+│   ├── index.js              # Main application entry point
+│   ├── config.js             # Configuration and constants
+│   ├── commands/             # Command handlers
+│   │   ├── index.js          # Command registry
+│   │   ├── status.js         # Status command
+│   │   ├── reserve.js        # Reserve command
+│   │   ├── release.js        # Release command
+│   │   ├── setEmoji.js       # Set emoji command
+│   │   ├── listEmojis.js     # List emojis command
+│   │   ├── firstline.js      # Firstline command
+│   │   └── help.js           # Help command
+│   └── utils/                # Utility functions
+│       ├── logger.js         # Logging utility
+│       ├── helpers.js        # Helper functions
+│       ├── validators.js     # Validation functions
+│       └── emojiStorage.js   # Emoji storage utility
+├── emoji_map.json            # Who uses which emoji
+├── firstline.json            # Current firstline person
+├── .env                      # Your local config
 ├── .gitignore
+├── package.json
 ├── LICENSE
 └── README.md
 ```
