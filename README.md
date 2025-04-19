@@ -1,5 +1,7 @@
 # Staging Butler
 
+[![Run Tests](https://github.com/publitas/staging-butler/actions/workflows/test.yml/badge.svg)](https://github.com/publitas/staging-butler/actions/workflows/test.yml)
+
 Simple Slack bot that helps you and your team avoid stepping on each other when using shared integration servers.
 
 No dashboards. No spreadsheets. Just a simple Slack bot that manages your staging environment.
