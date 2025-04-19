@@ -8,7 +8,8 @@ const cache = require('./cache');
  * @returns {boolean} True if valid
  */
 function isValidServer(server) {
-  return server && PATTERNS.SERVER_NAME.test(server);
+  if (!server) return false;
+  return PATTERNS.SERVER_NAME.test(server);
 }
 
 /**
@@ -17,7 +18,8 @@ function isValidServer(server) {
  * @returns {boolean} True if valid
  */
 function isValidEmoji(emoji) {
-  return emoji && PATTERNS.EMOJI.test(emoji);
+  if (!emoji) return false;
+  return PATTERNS.EMOJI.test(emoji);
 }
 
 /**

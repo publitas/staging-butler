@@ -54,10 +54,12 @@ npm install
 ### 3. Create a `.env` file
 
 ```env
+DEBUG=false
+EMOJI_MAP_PATH=./emoji_map.json
+PORT=3000
 SLACK_BOT_TOKEN=your-xoxb-token
 SLACK_SIGNING_SECRET=your-signing-secret
 STAGING_CHANNEL=C0123456789
-PORT=3000
 ```
 
 ---
@@ -220,6 +222,40 @@ staging-butler/
 ├── package.json
 ├── LICENSE
 └── README.md
+```
+
+## Testing
+
+The Staging Butler testing strategy focuses on unit testing key utility components rather than comprehensive coverage of all bot functionality.
+
+### Testing Philosophy
+
+- Focus on critical utility functions that are used throughout the application
+- Prioritize testing pure functions that don't require complex mocking
+- Ensure core functionality works as expected
+
+### Prioritized Components for Testing
+
+1. **Cache Utility** (`src/utils/cache.js`)
+   - Testing cache operations, TTL expiration, and invalidation
+
+2. **Validators** (`src/utils/validators.js`)
+   - Testing input validation functions like `isValidServer` and `isValidEmoji`
+
+3. **Helpers** (`src/utils/helpers.js`)
+   - Testing functions that parse and manipulate server status
+
+### Running Tests
+
+```sh
+# Install Jest (if not already in package.json)
+npm install --save-dev jest
+
+# Run all tests
+npm test
+
+# Run tests with coverage report
+npm test -- --coverage
 ```
 
 ---
