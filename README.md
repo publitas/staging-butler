@@ -3,8 +3,9 @@
 [![Run Tests](https://github.com/publitas/staging-butler/actions/workflows/test.yml/badge.svg)](https://github.com/publitas/staging-butler/actions/workflows/test.yml)
 
 Simple Slack bot that helps you and your team avoid stepping on each other when using shared integration servers.
-
 No dashboards. No spreadsheets. Just a simple Slack bot that manages your staging environment.
+
+![staging butler](https://github.com/user-attachments/assets/fd48ff77-1594-4c03-b6c9-82827027aeae)
 
 ---
 
@@ -14,7 +15,7 @@ No dashboards. No spreadsheets. Just a simple Slack bot that manages your stagin
 - Shows current state with `/reserve status`
 - Tracks who has what using emoji
 - Keeps everything visible by updating the channel topic
-- Designates a firstline person
+- Designates a first-line person
 - Helps coordinate servers with team members
 - Anyone can use it. Anyone can change emoji mappings.
 
@@ -157,7 +158,7 @@ Reinstall the bot after adding scopes.
 
 ## Caching Strategy
 
-Staging Butler implements a caching system to reduce Slack API rate limiting issues. The caching system focuses on expensive API calls that are frequently made:
+Staging Butler implements a caching system to reduce Slack API rate-limiting issues. The caching system focuses on expensive API calls that are frequently made:
 
 ### What's Cached
 
@@ -192,7 +193,7 @@ DEBUG=true npm start
 fly secrets set DEBUG=true
 ```
 
-This is particularly useful when troubleshooting rate limiting issues.
+This is particularly useful when troubleshooting rate-limiting issues.
 
 ---
 
