@@ -5,8 +5,6 @@
 Simple Slack bot that helps you and your team avoid stepping on each other when using shared integration servers.
 No dashboards. No spreadsheets. Just a simple Slack bot that manages your staging environment.
 
-![staging butler](https://github.com/user-attachments/assets/fd48ff77-1594-4c03-b6c9-82827027aeae)
-
 ---
 
 ## What It Does
@@ -18,6 +16,8 @@ No dashboards. No spreadsheets. Just a simple Slack bot that manages your stagin
 - Designates a first-line person
 - Helps coordinate servers with team members
 - Anyone can use it. Anyone can change emoji mappings.
+
+![staging butler](https://github.com/user-attachments/assets/fd48ff77-1594-4c03-b6c9-82827027aeae)
 
 ---
 
