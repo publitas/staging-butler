@@ -21,7 +21,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@slack/bolt": "^4.2.1"
+    "@slack/bolt": "^5.1.0"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.7.10",
