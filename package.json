@@ -24,7 +24,7 @@
     "@slack/bolt": "^5.1.0"
   },
   "devDependencies": {
-    "@flydotio/dockerfile": "^0.7.10",
+    "@flydotio/dockerfile": "^0.7.15",
     "jest": "^30.5.2"
   }
 }
